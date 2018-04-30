@@ -553,42 +553,43 @@ class Reader(object):
         line = next(self.reader)
         row = self._row_pattern.split(line.rstrip())
         chrom = row[0]
+        gene = row[1]
         if self._prepend_chr:
             chrom = 'chr' + chrom
-        pos = int(row[1])
+        pos = int(row[2])
 
         if row[2] != '.':
-            ID = row[2]
+            ID = row[3]
         else:
             ID = None
 
-        ref = row[3]
+        ref = row[4]
         alt = self._map(self._parse_alt, row[4].split(','))
 
         try:
-            qual = int(row[5])
+            qual = int(row[6])
         except ValueError:
             try:
-                qual = float(row[5])
+                qual = float(row[7])
             except ValueError:
                 qual = None
 
-        filt = self._parse_filter(row[6])
-        info = self._parse_info(row[7])
+        filt = self._parse_filter(row[7])
+        info = self._parse_info(row[8])
 
         try:
-            fmt = row[8]
+            fmt = row[9]
         except IndexError:
             fmt = None
         else:
             if fmt == '.':
                 fmt = None
 
-        record = _Record(chrom, pos, ID, ref, alt, qual, filt,
+        record = _Record(chrom, gene, pos, ID, ref, alt, qual, filt,
                 info, fmt, self._sample_indexes)
 
         if fmt is not None:
-            samples = self._parse_samples(row[9:], fmt, record)
+            samples = self._parse_samples(row[10:], fmt, record)
             record.samples = samples
 
         return record
@@ -692,7 +693,7 @@ class Writer(object):
 
     def write_record(self, record):
         """ write a record to the file """
-        ffs = self._map(str, [record.CHROM, record.POS, record.ID, record.REF]) \
+        ffs = self._map(str, [record.CHROM, record.GENE, record.POS, record.ID, record.REF]) \
               + [self._format_alt(record.ALT), record.QUAL or '.', self._format_filter(record.FILTER),
                  self._format_info(record.INFO)]
         if record.FORMAT:

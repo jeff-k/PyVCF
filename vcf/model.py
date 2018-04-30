@@ -172,9 +172,10 @@ class _Record(object):
             Neither the upstream nor downstream flanking bases are
             included in the region.
     """
-    def __init__(self, CHROM, POS, ID, REF, ALT, QUAL, FILTER, INFO, FORMAT,
+    def __init__(self, CHROM, GENE, POS, ID, REF, ALT, QUAL, FILTER, INFO, FORMAT,
             sample_indexes, samples=None):
         self.CHROM = CHROM
+        self.GENE = GENE
         #: the one-based coordinate of the first nucleotide in ``REF``
         self.POS = POS
         self.ID = ID
